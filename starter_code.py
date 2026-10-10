@@ -1,3 +1,4 @@
+
 """
 Sorting Assignment Starter Code
 Implement five sorting algorithms and benchmark their performance.
@@ -33,7 +34,17 @@ def bubble_sort(arr):
     # Hint: Use nested loops - outer loop for passes, inner loop for comparisons
     # Hint: Compare adjacent elements and swap if left > right
     
-    pass  # Delete this and write your code
+    result=arr.copy()
+    n=len(result)
+    for i in range(n):
+        swapped=False
+        for j in range(0,n-i-1):
+            if result[j]>result[j+1]:
+                result[j],result[j+1]=result[j+1],result[j]
+                swapped=True
+        if not swapped:
+            break
+    return result
 
 
 def selection_sort(arr):
@@ -55,7 +66,15 @@ def selection_sort(arr):
     # TODO: Implement selection sort
     # Hint: Find minimum element in unsorted portion, swap it with first unsorted element
     
-    pass  # Delete this and write your code
+    result=arr.copy()
+    n=len(result)
+    for i in range(n):
+        min_idx=i
+        for j in range(i+1,n):
+            if result[j]<result[min_idx]:
+                min_idx=j
+        result[i],result[min_idx]=result[min_idx],result[i]
+    return result
 
 
 def insertion_sort(arr):
@@ -77,7 +96,16 @@ def insertion_sort(arr):
     # TODO: Implement insertion sort
     # Hint: Start from second element, insert it into correct position in sorted portion
     
-    pass  # Delete this and write your code
+    result=arr.copy()
+    n=len(result)
+    for i in range(1,n):
+        key=result[i]
+        j=i-1
+        while j>=0 and result[j]>key:
+            result[j+1]=result[j]
+            j-=1
+        result[j+1]=key
+    return result
 
 
 def merge_sort(arr):
@@ -101,7 +129,23 @@ def merge_sort(arr):
     # Hint: Recursive case - split array in half, sort each half, merge sorted halves
     # Hint: You'll need a helper function to merge two sorted arrays
     
-    pass  # Delete this and write your code
+    if len(arr)<=1:
+        return arr.copy()
+    mid=len(arr)//2
+    left=merge_sort(arr[:mid])
+    right=merge_sort(arr[mid:])
+    result=[]
+    i=j=0
+    while i<len(left) and j<len(right):
+        if left[i]<=right[j]:
+            result.append(left[i])
+            i+=1
+        else:
+            result.append(right[j])
+            j+=1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
 
 
 # ============================================================================
@@ -142,6 +186,65 @@ def demonstrate_stability():
     
     # TODO: Test each algorithm and update results dictionary with "Stable" or "Unstable"
     
+    for name in results:
+        items=[product.copy() for product in products]
+
+        if name=="bubble_sort":
+            for i in range(len(items)):
+                for j in range(len(items)-i-1):
+                    if items[j]["price"]>items[j+1]["price"]:
+                        items[j],items[j+1]=items[j+1],items[j]
+
+        elif name=="selection_sort":
+            for i in range(len(items)):
+                min_idx=i
+                for j in range(i+1,len(items)):
+                    if items[j]["price"]<items[min_idx]["price"]:
+                        min_idx=j
+                items[i],items[min_idx]=items[min_idx],items[i]
+
+        elif name=="insertion_sort":
+            for i in range(1,len(items)):
+                key=items[i]
+                j=i-1
+                while j>=0 and items[j]["price"]>key["price"]:
+                    items[j+1]=items[j]
+                    j-=1
+                items[j+1]=key
+
+        elif name=="merge_sort":
+            def merge_products(arr):
+                if len(arr)<=1:
+                    return arr.copy()
+
+                mid=len(arr)//2
+                left=merge_products(arr[:mid])
+                right=merge_products(arr[mid:])
+                merged=[]
+                i=j=0
+
+                while i<len(left) and j<len(right):
+                    if left[i]["price"]<=right[j]["price"]:
+                        merged.append(left[i])
+                        i+=1
+                    else:
+                        merged.append(right[j])
+                        j+=1
+
+                merged.extend(left[i:])
+                merged.extend(right[j:])
+                return merged
+
+            items=merge_products(items)
+
+        stable=True
+        for i in range(1,len(items)):
+            if items[i]["price"]==items[i-1]["price"]:
+                if items[i]["original_position"]<items[i-1]["original_position"]:
+                    stable=False
+                    break
+
+        results[name]="Stable" if stable else "Unstable"
     return results
 
 
@@ -287,8 +390,8 @@ if __name__ == "__main__":
     
     # Uncomment these as you complete each part:
     
-    # test_sorting_correctness()
-    # benchmark_all_datasets()
-    # analyze_stability()
+    test_sorting_correctness()
+    benchmark_all_datasets()
+    analyze_stability()
     
     print("\n⚠ Uncomment the test functions in the main block to run benchmarks!")
